@@ -67,7 +67,7 @@ export function Lobby() {
 
       <button
         type="button"
-        className="btn btn--primary btn--block"
+        className="btn btn--primary btn--block lobby-start-btn"
         disabled={!canStart}
         onClick={() =>
           canStart && start({ nickname, department: dept as DepartmentId })

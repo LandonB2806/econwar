@@ -1010,6 +1010,7 @@ button {
 .app--lobby {
   position: relative;
   z-index: 1;
+  padding-bottom: 112px;
 }
 .lobby-bg {
   position: fixed;
@@ -1105,6 +1106,19 @@ button {
   display: flex;
   justify-content: flex-end;
   margin-bottom: var(--s2);
+}
+.lobby-start-btn {
+  position: sticky;
+  bottom: var(--s3);
+  z-index: 3;
+  max-width: 720px;
+  margin: var(--s4) auto 0;
+}
+.lobby-start-btn:disabled {
+  opacity: 1;
+  filter: grayscale(0.35);
+  background: var(--parchment-dark);
+  color: var(--ink);
 }
 
 /* ============================================================= *
