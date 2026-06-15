@@ -1,0 +1,12 @@
+node_modules
+**/node_modules
+**/dist
+**/*.tsbuildinfo
+.git
+.vitest
+coverage
+**/__pycache__
+**/.pytest_cache
+*.zip
+apps/client/econwar-dist.zip
+background_song.mp3

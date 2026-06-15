@@ -1,0 +1,15 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.vitest/
+coverage/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+
+# Build artifacts / large originals (the game's mp3 lives in apps/client/assets)
+*.zip
+/background_song.mp3

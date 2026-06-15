@@ -1,0 +1,41 @@
+- generic [ref=e3]:
+  - generic:
+    - generic:
+      - generic: GDP +2.4
+      - generic: PC +5
+      - generic: RICE +8
+      - generic: ENERGY -3
+      - generic: VOTE
+  - button "Settings" [ref=e5] [cursor=pointer]: ⚙
+  - generic [ref=e6]:
+    - heading "EconWar" [level=1] [ref=e7]
+    - paragraph [ref=e8]: Pick a department banner, read the town's market clues, and grow your coin jars across Thailand's four regions.
+  - generic [ref=e9]:
+    - heading "Join the town square" [level=2] [ref=e10]
+    - generic [ref=e11]:
+      - generic [ref=e12]: Player name
+      - textbox "Player name" [ref=e13]:
+        - /placeholder: e.g. Market Clerk
+    - generic [ref=e14]: Choose your department
+    - generic [ref=e15]:
+      - button "Government ปกครอง Control" [ref=e16] [cursor=pointer]:
+        - generic [ref=e19]: Government
+        - generic [ref=e20]: ปกครอง
+        - generic [ref=e21]: Control
+      - button "International Relations IR Information & alliances" [ref=e22] [cursor=pointer]:
+        - generic [ref=e25]: International Relations
+        - generic [ref=e26]: IR
+        - generic [ref=e27]: Information & alliances
+      - button "Sociology & Anthropology สังคมฯ Mass movement" [ref=e28] [cursor=pointer]:
+        - generic [ref=e31]: Sociology & Anthropology
+        - generic [ref=e32]: สังคมฯ
+        - generic [ref=e33]: Mass movement
+      - button "Public Administration รัฐปศ. Efficiency" [ref=e34] [cursor=pointer]:
+        - generic [ref=e37]: Public Administration
+        - generic [ref=e38]: รัฐปศ.
+        - generic [ref=e39]: Efficiency
+      - button "Politics & Global Studies การเมืองโลกฯ Strategist" [ref=e40] [cursor=pointer]:
+        - generic [ref=e43]: Politics & Global Studies
+        - generic [ref=e44]: การเมืองโลกฯ
+        - generic [ref=e45]: Strategist
+  - button "Pick a department" [disabled] [ref=e46]

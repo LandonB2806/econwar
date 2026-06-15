@@ -1,0 +1,27 @@
+{
+  "name": "econwar",
+  "private": true,
+  "version": "0.0.0",
+  "description": "EconWar — phase-based economic-strategy game (monorepo root)",
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "tsc --build",
+    "typecheck": "tsc --build --force",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lab:test": "python -m pytest lab -q",
+    "aesthetic:gate": "tsx tools/aesthetic-gate.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.22.4",
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.5"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

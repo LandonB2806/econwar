@@ -1,0 +1,60 @@
+{
+  "$comment": "One signature ability per department. 'kind' tells the engine how to resolve it during settlement. magnitudeBp is in basis points. INFO/REBALANCE have no direct settlement multiplier (resolved earlier in the round loop by the FSM/UI).",
+  "abilities": [
+    {
+      "id": "gov_tax",
+      "department": "government",
+      "name": "Levy",
+      "kind": "TAX",
+      "pcCost": 10,
+      "magnitudeBp": 1500,
+      "needsTargetPlayer": true,
+      "needsTargetRegion": false,
+      "description": "Tax 15% of a rival's market gain this phase into your own treasury."
+    },
+    {
+      "id": "ir_peek",
+      "department": "ir",
+      "name": "Intel",
+      "kind": "INFO",
+      "pcCost": 6,
+      "magnitudeBp": 0,
+      "needsTargetPlayer": false,
+      "needsTargetRegion": false,
+      "description": "Peek at extra indicator data before allocating. No settlement effect."
+    },
+    {
+      "id": "soc_marketmove",
+      "department": "sociology",
+      "name": "Movement",
+      "kind": "GLOBAL_REGION_MULT",
+      "pcCost": 12,
+      "magnitudeBp": 11200,
+      "needsTargetPlayer": false,
+      "needsTargetRegion": true,
+      "description": "Shift the whole market in one region by +12% — but every player invested there gains too."
+    },
+    {
+      "id": "pa_rebalance",
+      "department": "public_admin",
+      "name": "Rebalance",
+      "kind": "REBALANCE",
+      "pcCost": 8,
+      "magnitudeBp": 0,
+      "needsTargetPlayer": false,
+      "needsTargetRegion": false,
+      "description": "Rebalance your allocation once after the event is revealed. Resolved before settlement."
+    },
+    {
+      "id": "pg_foresight",
+      "department": "politics_global",
+      "name": "Foresight",
+      "kind": "INFO",
+      "pcCost": 9,
+      "magnitudeBp": 0,
+      "needsTargetPlayer": false,
+      "needsTargetRegion": false,
+      "description": "Read the true upcoming phase early. No settlement effect."
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "$comment": "regionalModifier(region, phase) in basis points (10000 = x1.0). Secondary factor: the region's inherent character/resilience per phase. Kept near 10000 so basePhaseEffect dominates.",
+  "regions": [
+    {
+      "id": "central",
+      "name": "Central",
+      "nameTh": "กลาง",
+      "character": "Startup / high-growth",
+      "modifier": { "boom": 10300, "recession": 9700, "recovery": 10000, "slowdown": 9800 }
+    },
+    {
+      "id": "north",
+      "name": "North",
+      "nameTh": "เหนือ",
+      "character": "Tourism / real estate",
+      "modifier": { "boom": 10000, "recession": 9900, "recovery": 10200, "slowdown": 9900 }
+    },
+    {
+      "id": "south",
+      "name": "South",
+      "nameTh": "ใต้",
+      "character": "Commodity / energy",
+      "modifier": { "boom": 9900, "recession": 10100, "recovery": 9900, "slowdown": 10200 }
+    },
+    {
+      "id": "northeast",
+      "name": "Northeast",
+      "nameTh": "อีสาน",
+      "character": "Agriculture / stable",
+      "modifier": { "boom": 9800, "recession": 10200, "recovery": 10100, "slowdown": 10100 }
+    }
+  ]
+}

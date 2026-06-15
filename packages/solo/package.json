@@ -1,0 +1,14 @@
+{
+  "name": "@econwar/solo",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@econwar/shared": "*",
+    "@econwar/engine": "*",
+    "@econwar/ai": "*"
+  }
+}

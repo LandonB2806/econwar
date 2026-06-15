@@ -1,0 +1,395 @@
+{
+  "cases": [
+    {
+      "name": "single_player_neutral_boom",
+      "seed": 12345,
+      "phaseType": "boom",
+      "controllerId": null,
+      "controllerTilt": {
+        "central": "10000",
+        "north": "10000",
+        "south": "10000",
+        "northeast": "10000"
+      },
+      "players": [
+        {
+          "id": "p1",
+          "department": "politics_global",
+          "money": "100000000",
+          "pc": 0
+        }
+      ],
+      "allocations": {
+        "p1": {
+          "central": "60000000",
+          "north": "0",
+          "south": "0",
+          "northeast": "40000000"
+        }
+      },
+      "abilities": [],
+      "expected": {
+        "eventId": "global_jitters",
+        "leaderboard": [
+          "p1"
+        ],
+        "players": {
+          "p1": {
+            "endMoney": "114005760",
+            "grossAfterMarket": "114005760",
+            "taxPaid": "0",
+            "taxReceived": "0",
+            "pcEnd": 13,
+            "regionResults": {
+              "central": "77126400",
+              "north": "0",
+              "south": "0",
+              "northeast": "36879360"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "controller_tilt_with_transparency_penalty",
+      "seed": 777,
+      "phaseType": "recovery",
+      "controllerId": "p2",
+      "controllerTilt": {
+        "central": "9700",
+        "north": "12000",
+        "south": "9700",
+        "northeast": "9700"
+      },
+      "players": [
+        {
+          "id": "p1",
+          "department": "government",
+          "money": "100000000",
+          "pc": 30
+        },
+        {
+          "id": "p2",
+          "department": "ir",
+          "money": "100000000",
+          "pc": 24
+        }
+      ],
+      "allocations": {
+        "p1": {
+          "central": "0",
+          "north": "50000000",
+          "south": "0",
+          "northeast": "50000000"
+        },
+        "p2": {
+          "central": "20000000",
+          "north": "80000000",
+          "south": "0",
+          "northeast": "0"
+        }
+      },
+      "abilities": [],
+      "expected": {
+        "eventId": "oil_spike_south",
+        "leaderboard": [
+          "p1",
+          "p2"
+        ],
+        "players": {
+          "p1": {
+            "endMoney": "134302300",
+            "grossAfterMarket": "134302300",
+            "taxPaid": "0",
+            "taxReceived": "0",
+            "pcEnd": 39,
+            "regionResults": {
+              "central": "0",
+              "north": "76500000",
+              "south": "0",
+              "northeast": "57802300"
+            }
+          },
+          "p2": {
+            "endMoney": "131112000",
+            "grossAfterMarket": "131112000",
+            "taxPaid": "0",
+            "taxReceived": "0",
+            "pcEnd": 35,
+            "regionResults": {
+              "central": "20952000",
+              "north": "110160000",
+              "south": "0",
+              "northeast": "0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "abilities_market_move_and_tax",
+      "seed": 9090,
+      "phaseType": "recession",
+      "controllerId": null,
+      "controllerTilt": {
+        "central": "10000",
+        "north": "10000",
+        "south": "10000",
+        "northeast": "10000"
+      },
+      "players": [
+        {
+          "id": "p1",
+          "department": "sociology",
+          "money": "100000000",
+          "pc": 40
+        },
+        {
+          "id": "p2",
+          "department": "government",
+          "money": "100000000",
+          "pc": 40
+        },
+        {
+          "id": "p3",
+          "department": "public_admin",
+          "money": "100000000",
+          "pc": 40
+        }
+      ],
+      "allocations": {
+        "p1": {
+          "central": "0",
+          "north": "0",
+          "south": "30000000",
+          "northeast": "70000000"
+        },
+        "p2": {
+          "central": "0",
+          "north": "0",
+          "south": "0",
+          "northeast": "100000000"
+        },
+        "p3": {
+          "central": "50000000",
+          "north": "0",
+          "south": "0",
+          "northeast": "50000000"
+        }
+      },
+      "abilities": [
+        {
+          "actorId": "p1",
+          "abilityId": "soc_marketmove",
+          "targetRegion": "northeast"
+        },
+        {
+          "actorId": "p2",
+          "abilityId": "gov_tax",
+          "targetPlayerId": "p3"
+        }
+      ],
+      "expected": {
+        "eventId": "bumper_harvest_ne",
+        "leaderboard": [
+          "p2",
+          "p1",
+          "p3"
+        ],
+        "players": {
+          "p1": {
+            "endMoney": "121036085",
+            "grossAfterMarket": "121036085",
+            "taxPaid": "0",
+            "taxReceived": "0",
+            "pcEnd": 39,
+            "regionResults": {
+              "central": "0",
+              "north": "0",
+              "south": "28785000",
+              "northeast": "92251085"
+            }
+          },
+          "p2": {
+            "endMoney": "132491309",
+            "grossAfterMarket": "131787264",
+            "taxPaid": "0",
+            "taxReceived": "704045",
+            "pcEnd": 44,
+            "regionResults": {
+              "central": "0",
+              "north": "0",
+              "south": "0",
+              "northeast": "131787264"
+            }
+          },
+          "p3": {
+            "endMoney": "103989587",
+            "grossAfterMarket": "104693632",
+            "taxPaid": "704045",
+            "taxReceived": "0",
+            "pcEnd": 50,
+            "regionResults": {
+              "central": "38800000",
+              "north": "0",
+              "south": "0",
+              "northeast": "65893632"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "round_half_up_boundary_boom_central",
+      "seed": 12345,
+      "phaseType": "boom",
+      "controllerId": null,
+      "controllerTilt": {
+        "central": "10000",
+        "north": "10000",
+        "south": "10000",
+        "northeast": "10000"
+      },
+      "players": [
+        {
+          "id": "p1",
+          "department": "ir",
+          "money": "100000000",
+          "pc": 0
+        }
+      ],
+      "allocations": {
+        "p1": {
+          "central": "1500",
+          "north": "0",
+          "south": "0",
+          "northeast": "0"
+        }
+      },
+      "abilities": [],
+      "expected": {
+        "eventId": "global_jitters",
+        "leaderboard": [
+          "p1"
+        ],
+        "players": {
+          "p1": {
+            "endMoney": "100000428",
+            "grossAfterMarket": "100000428",
+            "taxPaid": "0",
+            "taxReceived": "0",
+            "pcEnd": 11,
+            "regionResults": {
+              "central": "1928",
+              "north": "0",
+              "south": "0",
+              "northeast": "0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "slowdown_spread_three_players",
+      "seed": 4242,
+      "phaseType": "slowdown",
+      "controllerId": null,
+      "controllerTilt": {
+        "central": "10000",
+        "north": "10000",
+        "south": "10000",
+        "northeast": "10000"
+      },
+      "players": [
+        {
+          "id": "p1",
+          "department": "public_admin",
+          "money": "100000000",
+          "pc": 12
+        },
+        {
+          "id": "p2",
+          "department": "politics_global",
+          "money": "100000000",
+          "pc": 7
+        },
+        {
+          "id": "p3",
+          "department": "ir",
+          "money": "100000000",
+          "pc": 11
+        }
+      ],
+      "allocations": {
+        "p1": {
+          "central": "0",
+          "north": "0",
+          "south": "100000000",
+          "northeast": "0"
+        },
+        "p2": {
+          "central": "50000000",
+          "north": "50000000",
+          "south": "0",
+          "northeast": "0"
+        },
+        "p3": {
+          "central": "0",
+          "north": "0",
+          "south": "0",
+          "northeast": "100000000"
+        }
+      },
+      "abilities": [],
+      "expected": {
+        "eventId": "flood_north",
+        "leaderboard": [
+          "p1",
+          "p3",
+          "p2"
+        ],
+        "players": {
+          "p1": {
+            "endMoney": "103020000",
+            "grossAfterMarket": "103020000",
+            "taxPaid": "0",
+            "taxReceived": "0",
+            "pcEnd": 24,
+            "regionResults": {
+              "central": "0",
+              "north": "0",
+              "south": "103020000",
+              "northeast": "0"
+            }
+          },
+          "p2": {
+            "endMoney": "89184250",
+            "grossAfterMarket": "89184250",
+            "taxPaid": "0",
+            "taxReceived": "0",
+            "pcEnd": 14,
+            "regionResults": {
+              "central": "47530000",
+              "north": "41654250",
+              "south": "0",
+              "northeast": "0"
+            }
+          },
+          "p3": {
+            "endMoney": "101000000",
+            "grossAfterMarket": "101000000",
+            "taxPaid": "0",
+            "taxReceived": "0",
+            "pcEnd": 22,
+            "regionResults": {
+              "central": "0",
+              "north": "0",
+              "south": "0",
+              "northeast": "101000000"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

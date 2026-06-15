@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "lib": ["ES2022"],
+    "types": ["node", "ws"]
+  },
+  "references": [
+    { "path": "../../packages/shared" },
+    { "path": "../../packages/engine" },
+    { "path": "../../packages/ai" }
+  ],
+  "include": ["src/**/*.ts"]
+}

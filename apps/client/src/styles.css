@@ -1,0 +1,1384 @@
+/* EconWar visual system — implements DESIGN.md (the law).
+ * Bright, saturated, warm, alive. §0 anti-slop enforced: no purple gradients,
+ * no glows (depth = drop-shadow), pressed selected-states (never lazy borders),
+ * Pixelify Sans / VT323 / Nunito (never Press Start 2P / Inter), gold=money &
+ * teal=Political-Capital two-currency rule. */
+
+:root {
+  /* Core palette — DESIGN.md §2 (exact hex is law) */
+  --parchment: #f4dfa8;
+  --parchment-dark: #e7c982;
+  --wood: #9c5a2d;
+  --wood-dark: #5e3417;
+  --wood-light: #c17c42;
+  --ink: #3a2418;
+  --ink-soft: #6e5034;
+  --sky: #57c4e5;
+  --leaf: #5fb54a;
+  --gold: #ffc23c; /* MONEY */
+  --gold-deep: #d8941c;
+  --profit: #34c759;
+  --loss: #ff5a47;
+  --pc: #16c2b0; /* POLITICAL CAPITAL */
+  --pc-deep: #0e8e81;
+  --panel-shadow: rgba(94, 52, 23, 0.35);
+  /* Text that sits on a gold surface — ALWAYS dark, in both themes. */
+  --on-gold: #3a2418;
+  /* Title/light text that sits on a dark surface (wood/night) — ALWAYS light. */
+  --title-ink: #f4dfa8;
+
+  /* Department identity colors (03 §4) */
+  --dept-government: #b3262a;
+  --dept-ir: #2a6fb3;
+  --dept-sociology: #2f9e44;
+  --dept-public_admin: #868e96;
+  --dept-politics_global: #7048e8;
+
+  /* Type — DESIGN.md §3. Bai Jamjuree appended to every stack so Thai glyphs
+   * (absent in Pixelify/VT323/Nunito) fall through to it per-glyph — script
+   * routing without locale switching (CR-01 #6). */
+  --font-display: "Pixelify Sans", "Bai Jamjuree", system-ui, sans-serif; /* headings */
+  --font-num: "VT323", "Bai Jamjuree", monospace; /* money / PC / figures */
+  --font-body: "Nunito", "Bai Jamjuree", system-ui, sans-serif; /* copy */
+  --font-thai: "Bai Jamjuree", sans-serif; /* explicit Thai role */
+
+  /* Spacing scale — DESIGN.md §5 (base 4px) */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s6: 24px;
+  --s8: 32px;
+
+  /* z-index scale */
+  --z-sticky: 100;
+  --z-toast: 400;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-body);
+  color: var(--ink);
+  /* A sunlit daylit world: cerulean sky into lush grass. No purple, no glow. */
+  background: linear-gradient(180deg, var(--sky) 0%, #92d8ee 30%, var(--leaf) 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: var(--s4) var(--s4) 48px;
+  position: relative;
+}
+.app::before {
+  content: "";
+  position: fixed;
+  inset: auto 0 0;
+  height: 132px;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent 0 4%, rgba(94, 52, 23, 0.16) 4% 4.5%, transparent 4.5% 12%),
+    linear-gradient(180deg, transparent 0, rgba(95, 181, 74, 0.42) 100%);
+  opacity: 0.65;
+}
+.screen-gap {
+  height: var(--s3);
+}
+.hero-sign {
+  max-width: 720px;
+  margin: 0 auto var(--s4);
+  padding: var(--s3) var(--s4);
+  background: var(--wood);
+  border: 2px solid var(--wood-dark);
+  border-radius: 8px;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.2),
+    0 4px 0 var(--wood-dark);
+}
+.hero-sign .muted {
+  color: var(--title-ink);
+  max-width: 62ch;
+  margin: 0 auto;
+}
+.section-label {
+  display: block;
+  font-weight: 800;
+  margin-bottom: var(--s2);
+}
+
+/* ---- Headings: Pixelify Sans ---- */
+.pixel {
+  font-family: var(--font-display);
+  line-height: 1.4;
+  letter-spacing: 0.5px;
+}
+h1.pixel {
+  font-size: 40px;
+  color: var(--title-ink);
+  text-shadow: 2px 2px 0 var(--wood-dark);
+  margin: var(--s2) 0 var(--s1);
+}
+h2.pixel {
+  font-size: 28px;
+  color: var(--ink);
+  margin: 0 0 var(--s3);
+}
+h3.pixel {
+  font-size: 20px;
+  margin: 0 0 var(--s2);
+}
+
+/* ---- Numeric / ledger figures: VT323 ---- */
+.num {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.5px;
+}
+/* Two-currency rule: money is gold, PC is teal — everywhere, no exceptions. */
+.money {
+  font-family: var(--font-num);
+  font-size: 20px;
+  color: var(--gold-deep);
+  font-variant-numeric: tabular-nums;
+}
+.pc {
+  font-family: var(--font-num);
+  font-size: 20px;
+  color: var(--pc-deep);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Panels: parchment + 2px wood outline + top bevel + drop-shadow (§5) ---- */
+.panel {
+  background: var(--parchment);
+  border: 2px solid var(--wood-dark);
+  border-radius: 8px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 3px 0 var(--panel-shadow);
+  padding: var(--s4);
+  margin-bottom: var(--s4);
+}
+.panel--wood {
+  background: var(--wood);
+  color: var(--title-ink);
+  border-color: var(--wood-dark);
+}
+.panel--notice {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 28px),
+    var(--parchment);
+}
+
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2);
+  margin-bottom: var(--s4);
+  position: sticky;
+  top: var(--s2);
+  z-index: var(--z-sticky);
+}
+.topbar__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+}
+
+/* ---- HUD: the two-currency wallet ---- */
+.hud {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  background: var(--parchment);
+  border: 2px solid var(--wood-dark);
+  border-radius: 8px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 3px 0 var(--panel-shadow);
+  padding: var(--s2) var(--s3);
+}
+.hud__cell {
+  display: flex;
+  align-items: center;
+  gap: var(--s1);
+}
+.hud__name {
+  font-weight: 800;
+  color: var(--ink);
+}
+
+/* ---- Phase pips ---- */
+.phase-pips {
+  display: flex;
+  gap: var(--s1);
+  align-items: center;
+}
+.pip {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--wood);
+  border: 2px solid var(--wood-dark);
+  opacity: 0.55;
+}
+.pip--done {
+  background: var(--gold);
+  opacity: 1;
+}
+.pip--current {
+  background: var(--gold);
+  opacity: 1;
+  box-shadow: 0 0 0 2px var(--gold-deep);
+}
+
+/* ---- Step track ---- */
+.step-track {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1);
+  margin-top: var(--s3);
+  padding: var(--s2);
+  background: rgba(94, 52, 23, 0.22);
+  border: 2px solid rgba(94, 52, 23, 0.45);
+  border-radius: 8px;
+}
+.step-chip {
+  font-size: 16px;
+  font-family: var(--font-display);
+  padding: var(--s1) var(--s2);
+  border-radius: 6px;
+  background: var(--parchment);
+  color: var(--ink-soft);
+  border: 2px solid var(--wood-dark);
+}
+/* Selected = a real pressed, filled tab — never a lazy border (§6). */
+.step-chip--active {
+  background: var(--gold);
+  color: var(--on-gold);
+  box-shadow: inset 0 2px 4px rgba(94, 52, 23, 0.45);
+  transform: translateY(1px);
+}
+.step-chip--done {
+  opacity: 0.55;
+}
+
+/* ---- Buttons: chunky, 2px outline, top bevel, gold primary, press drops 2px (§6) ---- */
+button {
+  font-family: var(--font-body);
+  font-weight: 800;
+  cursor: pointer;
+}
+.btn {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--ink);
+  background: var(--parchment-dark);
+  border: 2px solid var(--wood-dark);
+  border-radius: 8px;
+  padding: var(--s3) var(--s4);
+  min-height: 48px;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.4),
+    0 3px 0 var(--wood-dark);
+  transition: transform 0.05s ease;
+}
+.btn:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+.btn:active {
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 2px 4px rgba(94, 52, 23, 0.35),
+    0 1px 0 var(--wood-dark);
+}
+.btn:disabled {
+  filter: grayscale(0.7);
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.btn--primary {
+  background: var(--gold);
+  color: var(--on-gold);
+}
+.btn--ghost {
+  background: transparent;
+  color: var(--title-ink);
+  box-shadow: 0 3px 0 var(--wood-dark);
+}
+.btn--block {
+  width: 100%;
+}
+
+/* ---- Focus ring: visible 2px gold (accessibility floor §6) ---- */
+:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* ---- Lobby department banners ---- */
+.dept-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--s3);
+}
+.dept-card {
+  position: relative;
+  border: 2px solid var(--wood-dark);
+  border-radius: 8px;
+  padding: var(--s3);
+  color: #fff;
+  text-align: left;
+  min-height: 140px;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.25),
+    0 3px 0 var(--wood-dark);
+  transition: transform 0.08s ease;
+  overflow: hidden;
+}
+.dept-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 30%),
+    linear-gradient(90deg, rgba(94, 52, 23, 0.24), transparent 18%);
+  pointer-events: none;
+}
+.dept-card > * {
+  position: relative;
+  z-index: 1;
+}
+.dept-card:hover {
+  transform: translateY(-2px);
+}
+/* Selected = pressed filled state, sits 2px lower, inner shadow — not a border. */
+.dept-card--selected {
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 0 0 3px var(--gold),
+    inset 0 3px 8px rgba(0, 0, 0, 0.4);
+}
+.dept-card__head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s1);
+  margin-bottom: var(--s1);
+}
+.dept-card__name {
+  font-family: var(--font-display);
+  font-size: 15px;
+  line-height: 1.15;
+  width: 100%;
+  overflow-wrap: break-word;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+}
+.dept-card__th {
+  opacity: 0.95;
+  font-size: 14px;
+  font-weight: 700;
+}
+.dept-card__style {
+  margin-top: var(--s2);
+  font-size: 13px;
+  background: rgba(0, 0, 0, 0.24);
+  border-radius: 6px;
+  padding: var(--s1) var(--s2);
+  display: inline-block;
+}
+
+/* ---- Allocation panel ---- */
+.alloc-row {
+  display: grid;
+  gap: var(--s2);
+  padding: var(--s3);
+  border-radius: 8px;
+  background: var(--parchment-dark);
+  border: 2px solid var(--wood-dark);
+  margin-bottom: var(--s3);
+  position: relative;
+  overflow: hidden;
+}
+.alloc-row--jar::before {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: var(--jar-fill, 0%);
+  background:
+    linear-gradient(180deg, rgba(255, 194, 60, 0.12), rgba(255, 194, 60, 0.34)),
+    var(--gold);
+  opacity: 0.32;
+  pointer-events: none;
+}
+.alloc-row > * {
+  position: relative;
+  z-index: 1;
+}
+.alloc-row__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 800;
+  gap: var(--s2);
+}
+.alloc-row__title {
+  gap: var(--s2);
+  min-width: 0;
+}
+.ledger-wrap {
+  margin-bottom: var(--s3);
+}
+.alloc-row input[type="range"] {
+  width: 100%;
+  height: 28px;
+  accent-color: var(--gold-deep);
+}
+.alloc-row input[type="number"] {
+  width: 100%;
+  font-family: var(--font-num);
+  font-size: 20px;
+  padding: var(--s2);
+  border: 2px solid var(--wood);
+  border-radius: 6px;
+  background: #fff;
+}
+.cash-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 800;
+  padding: var(--s2) var(--s3);
+  border-radius: 8px;
+  background: var(--wood);
+  color: var(--title-ink);
+  border: 2px solid var(--wood-dark);
+  margin-bottom: var(--s3);
+}
+.cash-bar--over {
+  background: var(--loss);
+}
+
+/* ---- Forms ---- */
+.field {
+  display: block;
+  margin-bottom: var(--s3);
+}
+.field--spaced {
+  margin-top: var(--s3);
+}
+.field label {
+  display: block;
+  font-weight: 800;
+  margin-bottom: var(--s1);
+}
+.field input,
+.field select {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 16px;
+  padding: var(--s3);
+  border: 2px solid var(--wood);
+  border-radius: 8px;
+  background: #fff;
+}
+
+/* ---- Voting hall ---- */
+.candidate {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  padding: var(--s3);
+  border: 2px solid var(--wood-dark);
+  border-radius: 8px;
+  margin-bottom: var(--s2);
+  background: var(--parchment);
+  width: 100%;
+  text-align: left;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.4),
+    0 3px 0 var(--wood-dark);
+  transition: transform 0.08s ease;
+}
+.candidate:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+}
+/* Selected candidate = pressed filled state (§6), not a border. */
+.candidate--selected {
+  background: var(--gold);
+  color: var(--on-gold);
+  transform: translateY(2px);
+  box-shadow: inset 0 2px 6px rgba(94, 52, 23, 0.45);
+}
+.candidate--selected .muted {
+  color: var(--on-gold);
+  opacity: 0.85;
+}
+.candidate__swatch {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 2px solid var(--wood-dark);
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+}
+.candidate__meta {
+  flex: 1;
+  min-width: 0;
+}
+.candidate__name {
+  font-weight: 800;
+}
+.badge {
+  font-size: 13px;
+  font-weight: 800;
+  padding: 2px var(--s2);
+  border-radius: 999px;
+  background: var(--gold);
+  color: var(--on-gold);
+  white-space: nowrap;
+}
+.badge--you {
+  background: var(--pc);
+  color: #06302c;
+}
+
+/* ---- The living coin-ledger (the signature, §8) ---- */
+.ledger {
+  display: grid;
+  gap: var(--s3);
+}
+.ledger__row {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  padding: var(--s3);
+  border-radius: 8px;
+  background: var(--parchment-dark);
+  border: 2px solid var(--wood-dark);
+  min-height: 64px;
+}
+.ledger__label {
+  font-weight: 800;
+  min-width: 96px;
+}
+.coin-stack {
+  display: flex;
+  align-items: flex-end;
+  gap: 1px;
+  flex: 1;
+  min-height: 36px;
+  flex-wrap: wrap;
+}
+.coin-stack canvas {
+  display: block;
+  margin-left: -8px; /* overlap coins into a stack */
+}
+.coin-stack canvas:first-child {
+  margin-left: 0;
+}
+
+/* ---- Settlement & leaderboard ---- */
+.settle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--s2);
+  padding: var(--s2) var(--s3);
+  border-radius: 8px;
+  background: var(--parchment-dark);
+  border: 2px solid var(--wood-dark);
+  margin-bottom: var(--s2);
+}
+.settle-row:nth-of-type(odd) {
+  background: #ebcf8f;
+}
+.delta-up {
+  color: var(--profit);
+  font-weight: 800;
+  font-family: var(--font-num);
+  font-size: 20px;
+  animation: coin-pop 0.5s ease;
+}
+.delta-down {
+  color: var(--loss);
+  font-weight: 800;
+  font-family: var(--font-num);
+  font-size: 20px;
+}
+@keyframes coin-pop {
+  0% {
+    transform: scale(0.7) translateY(6px);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.15) translateY(-2px);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes coin-rise {
+  0% {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.leaderboard {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.lb-row {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  padding: var(--s2) var(--s3);
+  border-radius: 8px;
+  margin-bottom: var(--s2);
+  background: var(--parchment-dark);
+  border: 2px solid var(--wood-dark);
+}
+.lb-row--you {
+  background: var(--gold);
+  color: var(--on-gold);
+}
+.lb-row--you .lb-money,
+.lb-row--you .muted {
+  color: var(--on-gold);
+}
+.lb-rank {
+  font-family: var(--font-display);
+  font-size: 20px;
+  width: 36px;
+  text-align: center;
+}
+.lb-name {
+  flex: 1;
+  font-weight: 800;
+}
+.lb-money {
+  font-family: var(--font-num);
+  font-size: 22px;
+  color: var(--gold-deep);
+  font-variant-numeric: tabular-nums;
+}
+
+.dept-dot {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 2px solid var(--wood-dark);
+  vertical-align: middle;
+}
+
+.muted {
+  color: var(--ink-soft);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.row {
+  display: flex;
+  gap: var(--s3);
+  flex-wrap: wrap;
+  align-items: center;
+}
+.spacer {
+  flex: 1;
+}
+.center {
+  text-align: center;
+}
+
+.indicator-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--s2);
+}
+.indicator-list li {
+  background: var(--parchment-dark);
+  border: 2px solid var(--wood-dark);
+  border-radius: 8px;
+  padding: var(--s2) var(--s3);
+  font-weight: 700;
+}
+.notice-grid li {
+  display: grid;
+  gap: var(--s1);
+  min-height: 92px;
+}
+.notice-grid strong {
+  font-family: var(--font-display);
+  font-size: 18px;
+}
+.notice-grid span {
+  line-height: 1.35;
+}
+
+.winner-banner {
+  text-align: center;
+  padding: var(--s6);
+}
+.winner-banner .trophy {
+  display: inline-grid;
+  place-items: center;
+  width: 76px;
+  height: 56px;
+  margin-bottom: var(--s2);
+  font-family: var(--font-display);
+  font-size: 24px;
+  color: var(--ink);
+  background: var(--gold);
+  border: 2px solid var(--wood-dark);
+  border-radius: 8px;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.35),
+    0 3px 0 var(--wood-dark);
+}
+
+.region-grid {
+  display: grid;
+  gap: var(--s2);
+  margin-bottom: var(--s3);
+}
+
+.ability-toggle {
+  font-weight: 800;
+}
+.ability-toggle__box {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--pc);
+}
+
+/* ---- Phaser pixel region map ---- */
+.region-map {
+  width: 100%;
+  max-width: 640px;
+  aspect-ratio: 16 / 9;
+  margin: 0 auto var(--s3);
+  border: 2px solid var(--wood-dark);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--parchment);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 3px 0 var(--panel-shadow);
+  image-rendering: pixelated;
+}
+.region-map canvas {
+  image-rendering: pixelated;
+  display: block;
+}
+
+.region-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--s2) var(--s4);
+}
+.region-legend__item {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  font-size: 14px;
+}
+.region-legend__item canvas {
+  flex: 0 0 auto;
+  image-rendering: pixelated;
+}
+
+/* ---- Responsive: single column on phones (§ mobile reflow) ---- */
+@media (max-width: 560px) {
+  h1.pixel {
+    font-size: 28px;
+  }
+  h2.pixel {
+    font-size: 22px;
+  }
+  .app {
+    padding: var(--s3) var(--s3) 40px;
+  }
+  .region-legend {
+    grid-template-columns: 1fr;
+  }
+  .topbar {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 800px) {
+  .topbar {
+    position: static;
+    align-items: stretch;
+  }
+  .topbar__brand,
+  .topbar > .row,
+  .hud {
+    width: 100%;
+    justify-content: center;
+  }
+  .step-chip {
+    flex: 1 1 140px;
+    text-align: center;
+  }
+  .candidate,
+  .settle-row,
+  .lb-row,
+  .ledger__row {
+    align-items: flex-start;
+  }
+  .settle-row {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- Reduced motion: honor the accessibility floor (§6/§7) ---- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ============================================================= *
+ * CR-01 #5 — Dark theme: a WARM COZY NIGHT TOWN, not neon-on-black.
+ * Deep indigo/brown night, warm lamplight, panels darkened to aged
+ * wood. The currency rule is preserved: Money = gold, PC = teal in
+ * both themes (just brightened for contrast on dark).
+ * ============================================================= */
+[data-theme="dark"] {
+  --parchment: #2f261d;        /* aged-wood panel */
+  --parchment-dark: #261e16;
+  --wood: #7a512f;
+  --wood-dark: #120d08;
+  --wood-light: #9a6a3e;
+  --ink: #f2e6cc;              /* light warm text */
+  --ink-soft: #cbb892;
+  --sky: #2b2452;             /* indigo dusk */
+  --leaf: #2f5d3a;
+  --gold: #ffc23c;            /* MONEY — unchanged */
+  --gold-deep: #ffd368;       /* brighter so gold figures read on dark */
+  --profit: #54d98a;
+  --loss: #ff7a68;
+  --pc: #16c2b0;              /* PC — unchanged */
+  --pc-deep: #4fe0d0;         /* brighter teal figures on dark */
+  --panel-shadow: rgba(0, 0, 0, 0.5);
+  --on-gold: #3a2418;         /* stays dark on gold */
+  --title-ink: #ffe9b8;       /* warm lamplight title */
+}
+[data-theme="dark"] body {
+  background: linear-gradient(180deg, #241d4a 0%, #3a2c2a 55%, #20351f 100%);
+}
+[data-theme="dark"] .field input,
+[data-theme="dark"] .field select,
+[data-theme="dark"] .alloc-row input[type="number"] {
+  background: #1d1711;
+  color: var(--ink);
+}
+
+/* ============================================================= *
+ * CR-01 #5 — Settings panel (gear button + modal)
+ * ============================================================= */
+.icon-btn {
+  font-family: var(--font-display);
+  font-size: 18px;
+  line-height: 1;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  background: var(--parchment);
+  color: var(--ink);
+  border: 2px solid var(--wood-dark);
+  border-radius: 8px;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.4),
+    0 3px 0 var(--wood-dark);
+  cursor: pointer;
+}
+.icon-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--wood-dark);
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 13, 8, 0.55);
+  display: grid;
+  place-items: center;
+  z-index: 400;
+  padding: var(--s4);
+}
+.modal {
+  width: min(440px, 100%);
+  background: var(--parchment);
+  border: 2px solid var(--wood-dark);
+  border-radius: 10px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 6px 0 var(--panel-shadow);
+  padding: var(--s4);
+}
+.modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--s3);
+}
+.setting {
+  display: grid;
+  gap: var(--s2);
+  padding: var(--s3) 0;
+  border-top: 2px solid var(--wood-dark);
+}
+.setting__label {
+  font-weight: 800;
+}
+.setting__row {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+}
+.setting input[type="range"] {
+  flex: 1;
+  height: 28px;
+  accent-color: var(--gold-deep);
+}
+.seg {
+  display: inline-flex;
+  border: 2px solid var(--wood-dark);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.seg button {
+  font-family: var(--font-display);
+  font-size: 16px;
+  padding: var(--s2) var(--s3);
+  background: var(--parchment-dark);
+  color: var(--ink);
+  border: none;
+  min-height: 40px;
+}
+.seg button + button {
+  border-left: 2px solid var(--wood-dark);
+}
+/* Pressed selected segment (§6) */
+.seg button[aria-pressed="true"] {
+  background: var(--gold);
+  color: var(--on-gold);
+  box-shadow: inset 0 2px 4px rgba(94, 52, 23, 0.45);
+}
+
+/* ============================================================= *
+ * CR-01 #2 — Lobby start-screen panorama (parallax layers)
+ * ============================================================= */
+.app--lobby {
+  position: relative;
+  z-index: 1;
+}
+.lobby-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.lobby-bg__sky {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, var(--sky) 0%, #9fe0f2 45%, #d9f0c0 70%, var(--leaf) 100%);
+}
+[data-theme="dark"] .lobby-bg__sky {
+  /* Warm dusk night, NOT a purple slop gradient (§0): deep indigo quickly warms
+   * to plum-brown then night grass — lamplit-town mood, not violet→indigo. */
+  background: linear-gradient(180deg, #232043 0%, #4a3340 38%, #4a3326 68%, #1c3a22 100%);
+}
+.lobby-bg__sun {
+  position: absolute;
+  top: 8%;
+  left: 50%;
+  width: 120px;
+  height: 120px;
+  margin-left: -60px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff2c4 0%, var(--gold) 60%, transparent 72%);
+  opacity: 0.85;
+}
+.lobby-bg__clouds {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 45%;
+}
+.lobby-bg__cloud {
+  position: absolute;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 10px;
+  box-shadow: 18px 8px 0 -2px rgba(255, 255, 255, 0.8);
+  animation: cloud-drift linear infinite;
+}
+.lobby-bg__districts {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 46%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 12px;
+}
+.lobby-bg__districts canvas {
+  image-rendering: pixelated;
+  filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.2));
+  animation: idle-bob 2.6s ease-in-out infinite;
+}
+.lobby-bg__districts canvas:nth-child(2) { animation-delay: 0.4s; }
+.lobby-bg__districts canvas:nth-child(3) { animation-delay: 0.8s; }
+.lobby-bg__districts canvas:nth-child(4) { animation-delay: 1.2s; }
+.lobby-bg__ground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 14%;
+  background: linear-gradient(180deg, var(--leaf), #3c7a3a);
+}
+[data-theme="dark"] .lobby-bg__ground {
+  background: linear-gradient(180deg, #2f5d3a, #1c3a22);
+}
+.hero-sign {
+  position: relative;
+  z-index: 2;
+  margin-bottom: var(--s4);
+}
+@keyframes cloud-drift {
+  from { transform: translateX(-140px); }
+  to { transform: translateX(110vw); }
+}
+@keyframes idle-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.lobby-topbar {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--s2);
+}
+
+/* ============================================================= *
+ * Feedback F-1 aesthetic gate: the lobby must read as Thai political
+ * economy at first glance, not as empty sky. These layers are concrete
+ * identity motifs: ballot/seal, ticker, Thailand silhouette, market, and
+ * four region landmarks. Depth uses hard shadows, never random glow.
+ * ============================================================= */
+.lobby-bg__seal {
+  position: absolute;
+  top: 7%;
+  left: min(7vw, 72px);
+  width: 104px;
+  height: 104px;
+  border: 4px solid var(--wood-dark);
+  border-radius: 50%;
+  background: var(--parchment);
+  box-shadow: 0 4px 0 rgba(94, 52, 23, 0.35);
+  opacity: 0.92;
+}
+.lobby-bg__seal-ring {
+  position: absolute;
+  inset: 12px;
+  border: 3px solid var(--wood);
+  border-radius: 50%;
+}
+.lobby-bg__seal-box {
+  position: absolute;
+  left: 29px;
+  top: 41px;
+  width: 46px;
+  height: 34px;
+  background: var(--pc);
+  border: 3px solid var(--wood-dark);
+  box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.35);
+}
+.lobby-bg__seal-slot {
+  position: absolute;
+  left: 36px;
+  top: 35px;
+  width: 34px;
+  height: 7px;
+  background: var(--wood-dark);
+  box-shadow: 0 -10px 0 var(--gold);
+}
+.lobby-bg__ticker {
+  position: absolute;
+  top: 21%;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: var(--s3);
+  justify-content: center;
+  align-items: center;
+  height: 32px;
+  padding: 0 var(--s4);
+  font-family: var(--font-num);
+  font-size: 22px;
+  color: var(--gold);
+  background: var(--wood-dark);
+  border-top: 3px solid var(--wood);
+  border-bottom: 3px solid var(--wood);
+  box-shadow: 0 4px 0 rgba(94, 52, 23, 0.25);
+}
+.lobby-bg__ticker span:nth-child(even) {
+  color: var(--pc);
+}
+.lobby-bg__map {
+  position: absolute;
+  top: 31%;
+  right: min(8vw, 92px);
+  width: 118px;
+  height: 156px;
+  opacity: 0.82;
+}
+.lobby-bg__map::before,
+.lobby-bg__map::after,
+.lobby-bg__map span {
+  content: "";
+  position: absolute;
+  background: rgba(244, 223, 168, 0.72);
+  border: 3px solid rgba(94, 52, 23, 0.72);
+  box-shadow: 0 3px 0 rgba(94, 52, 23, 0.25);
+}
+.lobby-bg__map::before {
+  left: 35px;
+  top: 0;
+  width: 42px;
+  height: 56px;
+  border-radius: 20px 22px 16px 18px;
+}
+.lobby-bg__map::after {
+  left: 27px;
+  top: 47px;
+  width: 56px;
+  height: 48px;
+  border-radius: 22px 18px 20px 24px;
+}
+.lobby-bg__map span:nth-child(1) {
+  left: 24px;
+  top: 86px;
+  width: 46px;
+  height: 48px;
+  border-radius: 18px 15px 20px 24px;
+}
+.lobby-bg__map span:nth-child(2) {
+  left: 45px;
+  top: 122px;
+  width: 34px;
+  height: 31px;
+  border-radius: 14px 12px 18px 18px;
+}
+.lobby-bg__map span:nth-child(3) {
+  left: 70px;
+  top: 132px;
+  width: 20px;
+  height: 18px;
+  border-radius: 8px;
+}
+.lobby-bg__districts {
+  bottom: 31%;
+  height: 38%;
+  gap: 10px;
+  padding: 0 12px 24px;
+}
+.lobby-bg__district {
+  position: relative;
+  display: grid;
+  place-items: end center;
+  width: clamp(78px, 11vw, 126px);
+  min-height: 142px;
+  border-bottom: 12px solid var(--wood-dark);
+}
+.lobby-bg__district::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -14px;
+  width: 86%;
+  height: 24px;
+  transform: translateX(-50%);
+  border: 3px solid var(--wood-dark);
+  background: var(--parchment);
+}
+.lobby-bg__district--central::before {
+  background: #ffb627;
+}
+.lobby-bg__district--north::before {
+  background: #3da35d;
+}
+.lobby-bg__district--south::before {
+  background: #00b4d8;
+}
+.lobby-bg__district--northeast::before {
+  background: #e9c46a;
+}
+.lobby-bg__district canvas {
+  position: relative;
+  z-index: 1;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.2));
+  animation: idle-bob 2.6s ease-in-out infinite;
+}
+.lobby-bg__district:nth-child(2) canvas {
+  animation-delay: 0.4s;
+}
+.lobby-bg__district:nth-child(3) canvas {
+  animation-delay: 0.8s;
+}
+.lobby-bg__district:nth-child(4) canvas {
+  animation-delay: 1.2s;
+}
+.lobby-bg__market {
+  position: absolute;
+  left: min(8vw, 96px);
+  bottom: 12%;
+  width: 176px;
+  height: 100px;
+}
+.lobby-bg__stall {
+  position: absolute;
+  bottom: 0;
+  width: 74px;
+  height: 52px;
+  background: var(--parchment);
+  border: 3px solid var(--wood-dark);
+  box-shadow: 0 4px 0 rgba(94, 52, 23, 0.35);
+}
+.lobby-bg__stall::before {
+  content: "";
+  position: absolute;
+  left: -5px;
+  top: -22px;
+  width: 84px;
+  height: 22px;
+  border: 3px solid var(--wood-dark);
+}
+.lobby-bg__stall--gold {
+  left: 0;
+}
+.lobby-bg__stall--gold::before {
+  background: linear-gradient(
+    90deg,
+    var(--gold) 0 16.6%,
+    var(--parchment) 16.6% 33.2%,
+    var(--gold) 33.2% 49.8%,
+    var(--parchment) 49.8% 66.4%,
+    var(--gold) 66.4% 83%,
+    var(--parchment) 83% 100%
+  );
+}
+.lobby-bg__stall--teal {
+  right: 0;
+}
+.lobby-bg__stall--teal::before {
+  background: linear-gradient(
+    90deg,
+    var(--pc) 0 16.6%,
+    var(--parchment) 16.6% 33.2%,
+    var(--pc) 33.2% 49.8%,
+    var(--parchment) 49.8% 66.4%,
+    var(--pc) 66.4% 83%,
+    var(--parchment) 83% 100%
+  );
+}
+.lobby-bg__coin,
+.lobby-bg__token {
+  position: absolute;
+  bottom: 61px;
+  width: 22px;
+  height: 22px;
+  border: 3px solid var(--wood-dark);
+  border-radius: 50%;
+  box-shadow: 0 3px 0 rgba(94, 52, 23, 0.35);
+}
+.lobby-bg__coin {
+  left: 44px;
+  background: var(--gold);
+}
+.lobby-bg__token {
+  right: 42px;
+  background: var(--pc);
+}
+
+@media (max-width: 720px) {
+  .lobby-bg__seal,
+  .lobby-bg__map {
+    transform: scale(0.72);
+    transform-origin: top left;
+  }
+  .lobby-bg__map {
+    right: 4px;
+  }
+  .lobby-bg__market {
+    transform: scale(0.7);
+    transform-origin: bottom left;
+    left: 8px;
+  }
+  .lobby-bg__ticker {
+    font-size: 16px;
+    overflow: hidden;
+    justify-content: flex-start;
+  }
+  .lobby-bg__districts {
+    bottom: 28%;
+    gap: 2px;
+    padding-bottom: 16px;
+  }
+  .lobby-bg__district {
+    width: 25%;
+    min-height: 116px;
+  }
+  .lobby-bg__district canvas {
+    max-width: 88px;
+    height: auto;
+  }
+}

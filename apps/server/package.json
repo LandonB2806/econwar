@@ -1,0 +1,23 @@
+{
+  "name": "@econwar/server",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "dev": "tsx watch src/main.ts",
+    "start": "tsx src/main.ts"
+  },
+  "dependencies": {
+    "@econwar/shared": "*",
+    "@econwar/engine": "*",
+    "@econwar/ai": "*",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.4",
+    "@types/ws": "^8.5.12"
+  }
+}

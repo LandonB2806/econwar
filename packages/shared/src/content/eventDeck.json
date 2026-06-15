@@ -1,0 +1,16 @@
+{
+  "$comment": "One event is drawn per phase from this weighted deck via the seeded RNG. multiplierBp applies to the targeted region (or all regions if target='all'). target='none' is a calm phase (no event). The draw is unbiased multiply-shift over total weight.",
+  "events": [
+    { "id": "calm", "name": "Calm Markets", "target": "none", "multiplierBp": 10000, "weight": 24 },
+    { "id": "tech_rally_central", "name": "Tech Rally (Central)", "target": "central", "multiplierBp": 11800, "weight": 8 },
+    { "id": "startup_bust_central", "name": "Startup Bust (Central)", "target": "central", "multiplierBp": 8600, "weight": 8 },
+    { "id": "tourism_surge_north", "name": "Tourism Surge (North)", "target": "north", "multiplierBp": 11500, "weight": 8 },
+    { "id": "flood_north", "name": "Monsoon Flood (North)", "target": "north", "multiplierBp": 8500, "weight": 8 },
+    { "id": "oil_spike_south", "name": "Oil Price Spike (South)", "target": "south", "multiplierBp": 11600, "weight": 8 },
+    { "id": "commodity_slump_south", "name": "Commodity Slump (South)", "target": "south", "multiplierBp": 8800, "weight": 8 },
+    { "id": "bumper_harvest_ne", "name": "Bumper Harvest (Northeast)", "target": "northeast", "multiplierBp": 11200, "weight": 8 },
+    { "id": "drought_ne", "name": "Drought (Northeast)", "target": "northeast", "multiplierBp": 9000, "weight": 8 },
+    { "id": "global_optimism", "name": "Global Optimism", "target": "all", "multiplierBp": 10400, "weight": 2 },
+    { "id": "global_jitters", "name": "Global Jitters", "target": "all", "multiplierBp": 9600, "weight": 2 }
+  ]
+}

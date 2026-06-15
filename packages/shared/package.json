@@ -1,0 +1,13 @@
+{
+  "name": "@econwar/shared",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./content/*": "./src/content/*"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "$comment": "basePhaseEffect(phase, region) in basis points (10000 = x1.0). Primary settlement factor: what each economic phase does to each region. The phase order in a game is hidden + shuffled.",
+  "phases": [
+    {
+      "type": "boom",
+      "theme": "Expansion",
+      "baseEffect": { "central": 13000, "north": 10800, "south": 10500, "northeast": 9800 }
+    },
+    {
+      "type": "recession",
+      "theme": "Contraction",
+      "baseEffect": { "central": 8000, "north": 9200, "south": 9500, "northeast": 10300 }
+    },
+    {
+      "type": "recovery",
+      "theme": "Rebound",
+      "baseEffect": { "central": 10800, "north": 12500, "south": 10200, "northeast": 11800 }
+    },
+    {
+      "type": "slowdown",
+      "theme": "Stagnation",
+      "baseEffect": { "central": 9700, "north": 9900, "south": 10100, "northeast": 10000 }
+    }
+  ]
+}

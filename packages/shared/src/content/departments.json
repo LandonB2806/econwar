@@ -1,0 +1,50 @@
+{
+  "$comment": "pcRate = Political Capital earned by a department at the end of each phase (integer PC). Reflects each department's strength windows from the design spec.",
+  "departments": [
+    {
+      "id": "government",
+      "name": "Government",
+      "nameTh": "ปกครอง",
+      "color": "#b3262a",
+      "playStyle": "Control",
+      "abilityId": "gov_tax",
+      "pcRate": { "boom": 8, "recession": 14, "recovery": 9, "slowdown": 11 }
+    },
+    {
+      "id": "ir",
+      "name": "International Relations",
+      "nameTh": "IR",
+      "color": "#2a6fb3",
+      "playStyle": "Information & alliances",
+      "abilityId": "ir_peek",
+      "pcRate": { "boom": 11, "recession": 10, "recovery": 11, "slowdown": 11 }
+    },
+    {
+      "id": "sociology",
+      "name": "Sociology & Anthropology",
+      "nameTh": "สังคมฯ",
+      "color": "#2f9e44",
+      "playStyle": "Mass movement",
+      "abilityId": "soc_marketmove",
+      "pcRate": { "boom": 12, "recession": 11, "recovery": 12, "slowdown": 9 }
+    },
+    {
+      "id": "public_admin",
+      "name": "Public Administration",
+      "nameTh": "รัฐปศ.",
+      "color": "#868e96",
+      "playStyle": "Efficiency",
+      "abilityId": "pa_rebalance",
+      "pcRate": { "boom": 10, "recession": 10, "recovery": 10, "slowdown": 12 }
+    },
+    {
+      "id": "politics_global",
+      "name": "Politics & Global Studies",
+      "nameTh": "การเมืองโลกฯ",
+      "color": "#7048e8",
+      "playStyle": "Strategist",
+      "abilityId": "pg_foresight",
+      "pcRate": { "boom": 13, "recession": 11, "recovery": 12, "slowdown": 7 }
+    }
+  ]
+}
